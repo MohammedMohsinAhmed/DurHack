@@ -7,16 +7,28 @@ import os
 import tiktoken
 import time
 from url_to_summary import send
+import re
+import random
 
 
 def get_positivity(summary, country):
     with open("secrets.txt", "r") as file:
         openai.api_key = api_key = json.load(file)['openai_key']
     prompt = f'''
-	you are only to respond with a number (-1 to 1) based on how Positive you as an expert believe the summary for increase the price of {country}'s currency, you will not respond with anything other than an 3dp number in this interval, no polite explanation,
+	you are only to respond with a 3dp number in the range of +-1 (uniformly distributed) based on how Positive you as an expert believe the summary for increase the price of {country}'s currency, you will not respond with anything other than an 3dp number in this interval, no polite explanation,
 	'''
-    response = send(prompt=prompt, text_data=summary)
-    return (response[0])
+    response = send(prompt=prompt, text_data=summary, temperature=0)
+    try:
+        result = float(response.content)
+    except:
+        print(response)
+        try:
+            result = re.findall(r'\d+(\.\d+)?', response.content)
+            print(result)
+        except:
+            result = random.random()
+
+    return (float(result))
 
 
 if __name__ == '__main__':

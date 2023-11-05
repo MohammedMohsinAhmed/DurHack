@@ -86,10 +86,10 @@ with col1:
             left_overall += int(importance_rating)*float(positivity_rating)
             st.write(f"Importance Rating: {importance_rating}")
             st.write(f"Positivity Rating: {positivity_rating}")
-            lr_col.write(f"Overall Score: {round(left_overall,2)}")
 
         st.markdown(
             f"[Read full article]({article['url']})", unsafe_allow_html=True)
+    lr_col.write(f"Overall Score: {round(left_overall/5, 2)}")
 
 # Column 2
 with col2:
@@ -125,7 +125,7 @@ with col2:
             right_overall += int(importance_rating)*float(positivity_rating)
             st.write(f"Importance Rating: {importance_rating}")
             st.write(f"Positivity Rating: {positivity_rating}")
-            rr_col.write(f"Overall Score: {right_overall}")
 
         st.markdown(
             f"[Read full article]({article['url']})", unsafe_allow_html=True)
+    rr_col.write(f"Overall Score: {round(right_overall/5, 2)}")
