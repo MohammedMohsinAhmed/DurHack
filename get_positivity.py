@@ -26,7 +26,7 @@ def get_positivity(summary, country):
             result = re.findall(r'\d+(\.\d+)?', response.content)
             print(result)
         except:
-            result = random.random()
+            result = round(random.random(), 2)
 
     return (float(result))
 

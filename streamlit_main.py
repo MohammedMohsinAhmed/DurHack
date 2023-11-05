@@ -4,6 +4,8 @@ import json
 from url_to_summary import get_summary
 from get_importance import get_importance
 from get_positivity import get_positivity
+from urllib.parse import urlparse
+import statistics
 
 # Define a mapping from country to currency
 country_to_currency = {
@@ -14,11 +16,18 @@ country_to_currency = {
     "australia": "AUD",
     # Add more countries and their respective currencies here
 }
-left_overall = 0
-right_overall = 0
+left_overall = [0, 0]
+right_overall = [0, 0]
 
 # Define a function to fetch articles
 st.set_page_config(layout="wide")
+
+
+def get_image_url(url):
+    parsed_url = urlparse(url)
+    base_url = f"{parsed_url.scheme}://{parsed_url.netloc}"
+    favicon_url = f"{base_url}/favicon.ico"
+    return favicon_url
 
 
 @st.cache_data
@@ -79,17 +88,20 @@ with col1:
             break
         with st.expander(article['title']):
             st.write(article.get('description', get_summary(article['url'])))
+
             importance_rating = get_importance(article.get(
                 'description', get_summary(article['url'])), country_left)
             positivity_rating = get_positivity(article.get(
                 'description', get_summary(article['url'])), country_left)
-            left_overall += int(importance_rating)*float(positivity_rating)
+            left_overall += [int(importance_rating)*float(positivity_rating)]
             st.write(f"Importance Rating: {importance_rating}")
             st.write(f"Positivity Rating: {positivity_rating}")
-
-        st.markdown(
-            f"[Read full article]({article['url']})", unsafe_allow_html=True)
-    lr_col.write(f"Overall Score: {round(left_overall/5, 2)}")
+            st.image(get_image_url(article['url']))
+            st.markdown(
+                f"[Read full article]({article['url']})", unsafe_allow_html=True)
+lr_col.write(f"Overall Score: {round(statistics.mean(left_overall), 2)}")
+lr_col.write(
+    (f"Volatility: {round(statistics.variance(left_overall), 2)}"))
 
 # Column 2
 with col2:
@@ -122,10 +134,12 @@ with col2:
                 'description', get_summary(article['url'])), country_right)
             positivity_rating = get_positivity(article.get(
                 'description', get_summary(article['url'])), country_right)
-            right_overall += int(importance_rating)*float(positivity_rating)
+            right_overall += [int(importance_rating)*float(positivity_rating)]
             st.write(f"Importance Rating: {importance_rating}")
             st.write(f"Positivity Rating: {positivity_rating}")
-
-        st.markdown(
-            f"[Read full article]({article['url']})", unsafe_allow_html=True)
-    rr_col.write(f"Overall Score: {round(right_overall/5, 2)}")
+            st.image(get_image_url(article['url']))
+            st.markdown(
+                f"[Read full article]({article['url']})", unsafe_allow_html=True)
+rr_col.write(f"Overall Score: {round(statistics.mean(right_overall), 2)}")
+rr_col.write(
+    (f"Volatility: {round(statistics.variance(right_overall), 2)}"))
